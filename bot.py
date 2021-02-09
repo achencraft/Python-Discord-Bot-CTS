@@ -1,11 +1,21 @@
+import os
 import discord
+import structlog
+from dotenv import load_dotenv 
 from discord.ext import commands
 
 
-TOKEN = 'NjI3MjA0NzI5NTkxNjkzMzIy.XY5P7A.1IVGsIao1btuCM_P16oknCrp5Ss'
+log = structlog.get_logger()
+dotenv_path = join(dirname(__file__), '.env')
+if os.path.exists(dotenv_path):
+    log.info('loading environment')
+    load_dotenv(dotenv_path)
+
+TOKEN = os.getenv('BOT_TOKEN')
+BOT_PREFIX = os.getenv('BOT_PREFIX', 'CTS?')
 
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix="CTS?",  case_insensitive=True, intents=intents)
+bot = commands.Bot(command_prefix=BOT_PREFIX,  case_insensitive=True, intents=intents)
 
 
 @bot.event
@@ -33,5 +43,3 @@ async def bot_log_message(*args, **kwargs):
 if __name__ == "__main__":
 
     bot.run(TOKEN, bot=True, reconnect=True)
-
-
