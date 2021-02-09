@@ -49,6 +49,7 @@ if __name__ == "__main__":
         'extensions.admin',
         'extensions.help',
         'extensions.utils'
+    ]
 
     for extension in EXTENSIONS:
         bot.load_extension(extension)
