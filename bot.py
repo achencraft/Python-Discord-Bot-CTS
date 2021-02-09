@@ -16,6 +16,7 @@ TOKEN = os.getenv('BOT_TOKEN')
 BOT_PREFIX = os.getenv('BOT_PREFIX', 'CTS? ')
 BOT_NAME = os.getenv('BOT_NAME','Bot-CTS')
 
+
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix=BOT_PREFIX,  case_insensitive=True, intents=intents)
 
@@ -24,6 +25,7 @@ bot = commands.Bot(command_prefix=BOT_PREFIX,  case_insensitive=True, intents=in
 async def on_ready():
     print('We have logged in as {0.user}'.format(bot))
     await bot_log_message(f"{BOT_NAME} a démarré.")
+
 
 
 async def bot_log_message(*args, **kwargs):
@@ -48,9 +50,8 @@ if __name__ == "__main__":
         'extensions.help',
         'extensions.utils'
 
-    ]
-
     for extension in EXTENSIONS:
         bot.load_extension(extension)
 
     bot.run(TOKEN, bot=True, reconnect=True)
+
