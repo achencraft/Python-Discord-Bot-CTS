@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import requests
+import structlog
 import json
 import textdistance
 from datetime import datetime
@@ -49,15 +50,6 @@ class StopListCog(commands.Cog):
         for reaction in self.REACTIONS_NAV:
             await msg.add_reaction(reaction)
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
-        channel_id = payload.channel_id
-
-        if channel_id == self.channel_bdd_users.id:
-            await self.loadUsers()
-        elif channel_id == self.channel_bdd_users_link.id:
-            await self.loadUsersLink()
-
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -102,6 +94,8 @@ class StopListCog(commands.Cog):
             return
         
         nbr_page = len(self.stopslist)//nbr_stop_per_page
+        if(len(self.stopslist)%nbr_stop_per_page > 0):
+            nbr_page = nbr_page+1
 
         
         page_to_show = -1
@@ -137,6 +131,7 @@ class StopListCog(commands.Cog):
         
 
     def get_stops_list(self):
+        log = structlog.get_logger()
         stopList = []
         codeList = []
 
@@ -151,7 +146,7 @@ class StopListCog(commands.Cog):
             if(stopcode not in codeList):
                 codeList.append(stopcode)
                 stopList.append((stopname, stopcode))
-
+        log.info('stoplist created')
         self.stopslist = sorted(stopList, key=lambda stop: stop[0]) #tri alphabetique
 
      
