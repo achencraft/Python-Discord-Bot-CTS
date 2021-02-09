@@ -11,7 +11,7 @@ bot = commands.Bot(command_prefix="CTS?",  case_insensitive=True, intents=intent
 @bot.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(bot))
-    await bot_log_message(f"Bot-CTS a démarré en version {$CI_COMMIT_SHORT_SHA}")
+    await bot_log_message(f"Bot-CTS a démarré en version")
 
 
 async def bot_log_message(*args, **kwargs):
