@@ -1,6 +1,7 @@
 import os
 import discord
 import structlog
+from os.path import join, dirname
 from dotenv import load_dotenv 
 from discord.ext import commands
 
