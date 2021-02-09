@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 
-TOKEN = '07c5cb9d532d44f77b1a1d2dd8f8299307ebb38d7f6a7ff919927379bec31129'
+TOKEN = 07c5cb9d532d44f77b1a1d2dd8f8299307ebb38d7f6a7ff919927379bec31129
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="CTS?",  case_insensitive=True, intents=intents)
