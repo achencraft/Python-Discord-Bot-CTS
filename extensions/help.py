@@ -13,7 +13,7 @@ class HelpCog(commands.Cog):
                 self.guild = guild
 
 
-    @commands.command(name='aide')
+    @commands.command(name='aide', aliases=[''])
     async def help(self, ctx):
         """
         Commande: !help ou !aide
@@ -29,10 +29,28 @@ class HelpCog(commands.Cog):
         embed.description = ""
         embed.description += "==== BOT CTS - Aide ====\n"
         embed.description += "- `CTS? aide` : pour obtenir l'aide des commandes\n"
+        embed.description += "- `CTS? stations` : pour obtenir la liste des stations\n"
         embed.description += "- `CTS? next <station>` : pour obtenir les prochains passages en station\n"
 
         await ctx.send(embed=embed)
 
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        """
+        Affiche l'aide si un erreur de commande survient
+        """       
+        if(ctx.command == None):
+            await self.help(ctx)
+            
+    @commands.Cog.listener()
+    async def on_message(self, ctx):
+        """
+        Affiche l'aide si l'utilisateur tape le préfix sans commande
+        """
+        utils_cog = self.bot.get_cog('UtilsCog')
+        if(ctx.content == utils_cog.settings.BOT_PREFIX.replace(' ', '')):
+            await self.help(ctx.channel)
+            
 
   
 def setup(bot):
