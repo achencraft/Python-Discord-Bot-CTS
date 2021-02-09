@@ -21,10 +21,13 @@ intents = discord.Intents.all()
 bot = commands.Bot(command_prefix=BOT_PREFIX,  case_insensitive=True, intents=intents)
 
 
+
 @bot.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(bot))
     await bot_log_message(f"{BOT_NAME} a démarré.")
+    action = discord.Game("🚉 CTS? aide")
+    await bot.change_presence(status=discord.Status.online, activity=action)
 
 
 
@@ -48,6 +51,7 @@ if __name__ == "__main__":
     EXTENSIONS = [
         'extensions.admin',
         'extensions.help',
+        'extensions.stoplist',
         'extensions.utils'
     ]
 
