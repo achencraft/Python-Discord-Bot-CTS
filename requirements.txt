@@ -1,0 +1,5 @@
+discord.py
+structlog
+python-dotenv
+requests
+textdistance

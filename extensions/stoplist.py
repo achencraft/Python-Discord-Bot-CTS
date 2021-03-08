@@ -35,8 +35,11 @@ class StopListCog(commands.Cog):
         """
         utils_cog = self.bot.get_cog('UtilsCog')
         nbr_stop_per_page = int(utils_cog.settings.NBR_STOP_PER_PAGE)
+        nbr_page = len(self.stopslist)//nbr_stop_per_page
+        if(len(self.stopslist)%nbr_stop_per_page > 0):
+            nbr_page = nbr_page+1
 
-        titre = f"Liste des points d'arrêt - page 1/{len(self.stopslist)//nbr_stop_per_page}"
+        titre = f"Liste des points d'arrêt - page 1/{nbr_page}"
         content = ""
         stop_to_show = [s[0] for  s in self.stopslist[:nbr_stop_per_page]]
         for stop in enumerate(stop_to_show):

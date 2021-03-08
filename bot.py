@@ -51,6 +51,7 @@ if __name__ == "__main__":
     EXTENSIONS = [
         'extensions.admin',
         'extensions.help',
+        'extensions.next',
         'extensions.stoplist',
         'extensions.utils'
     ]
