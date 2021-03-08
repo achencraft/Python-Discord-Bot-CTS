@@ -3,4 +3,4 @@ structlog
 python-dotenv
 requests
 textdistance
-pytz
+arrow
