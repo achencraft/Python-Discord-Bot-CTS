@@ -6,6 +6,7 @@ import typing
 import json
 import textdistance
 from datetime import datetime
+import pytz
 
 class NextCog(commands.Cog):
     def __init__(self, bot):
@@ -83,13 +84,15 @@ class NextCog(commands.Cog):
                 destination = passage['MonitoredVehicleJourney']['DestinationName']
                 heure_passage = passage['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime']
                 temps = self.Time_convert(heure_passage)
-                now = datetime.now()
+                country_time_zone = pytz.timezone('Europe/Paris')
+                now = datetime.now(country_time_zone)
                 diff = temps - now
                 temps_attente = str(diff.seconds//60)
 
                 out = (line,destination,temps_attente)
                 passages.append(out)
         
+
         return (stop_name,passages)
 
 
