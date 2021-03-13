@@ -40,11 +40,14 @@ class NextCog(commands.Cog):
         station_name = station
 
 
+        #si la saisie est un nombre
         if station.strip('-').isnumeric():
             if self.stopIdExists(station):
                 stop_id = int(station)
             else:
                 distance = int(utils_cog.settings.DISTANCE_MAX) + 1
+        
+        #si la saisie est une chaine
         else:
             closest_name = self.findClosestStopName(station)
             stop_id = closest_name[0][1]
@@ -76,22 +79,23 @@ class NextCog(commands.Cog):
         query = self.session.get(f"https://api.cts-strasbourg.eu/v1/siri/2.0/stop-monitoring?MaximumStopVisits=3&MinimumStopVisitsPerLine=1&MonitoringRef={stop_id}")
         ans = json.loads(query.text)     
 
-        if len(ans["ServiceDelivery"]["StopMonitoringDelivery"][0]['MonitoredStopVisit']) > 0:
-            stop_name = ans["ServiceDelivery"]["StopMonitoringDelivery"][0]['MonitoredStopVisit'][0]['MonitoredVehicleJourney']['MonitoredCall']['StopPointName']
-            
-            for passage in ans["ServiceDelivery"]["StopMonitoringDelivery"][0]['MonitoredStopVisit']:
-                line = passage['MonitoredVehicleJourney']['PublishedLineName']
-                destination = passage['MonitoredVehicleJourney']['DestinationName']
-                heure_passage = passage['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime']
-                temps = arrow.get(heure_passage)
-                utcnow = utc = arrow.utcnow()
-                now = utc.to('Europe/Paris')
-                diff = temps - now
-                temps_attente = str(diff.seconds//60)
+        if 'MonitoredStopVisit' in ans["ServiceDelivery"]["StopMonitoringDelivery"][0]:
+            if len(ans["ServiceDelivery"]["StopMonitoringDelivery"][0]['MonitoredStopVisit']) > 0:
+                stop_name = ans["ServiceDelivery"]["StopMonitoringDelivery"][0]['MonitoredStopVisit'][0]['MonitoredVehicleJourney']['MonitoredCall']['StopPointName']
+                
+                for passage in ans["ServiceDelivery"]["StopMonitoringDelivery"][0]['MonitoredStopVisit']:
+                    line = passage['MonitoredVehicleJourney']['PublishedLineName']
+                    destination = passage['MonitoredVehicleJourney']['DestinationName']
+                    heure_passage = passage['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime']
+                    temps = arrow.get(heure_passage)
+                    utcnow = utc = arrow.utcnow()
+                    now = utc.to('Europe/Paris')
+                    diff = temps - now
+                    temps_attente = str(diff.seconds//60)
 
-                out = (line,destination,temps_attente)
-                passages.append(out)
-        
+                    out = (line,destination,temps_attente)
+                    passages.append(out)
+            
         print(passages)
 
         return (stop_name,passages)
