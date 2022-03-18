@@ -53,7 +53,8 @@ if __name__ == "__main__":
         'extensions.help',
         'extensions.next',
         'extensions.stoplist',
-        'extensions.utils'
+        'extensions.utils',
+        'extensions.luxembourg'
     ]
 
     for extension in EXTENSIONS:

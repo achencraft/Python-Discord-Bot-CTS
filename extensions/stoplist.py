@@ -39,14 +39,14 @@ class StopListCog(commands.Cog):
         if(len(self.stopslist)%nbr_stop_per_page > 0):
             nbr_page = nbr_page+1
 
-        titre = f"Liste des points d'arrêt - page 1/{nbr_page}"
+        titre = f"Liste des points d'arrêt CTS - page 1/{nbr_page}"
         content = ""
         stop_to_show = [s[0] for  s in self.stopslist[:nbr_stop_per_page]]
         for stop in enumerate(stop_to_show):
             content += '\n {}'.format(stop[1])
 
         embed = discord.Embed(title=titre, description=content)
-        embed.set_footer(text='stoplist:1')
+        embed.set_footer(text='stoplist_cts:1')
 
         msg = await ctx.send(embed=embed)
         
@@ -86,7 +86,7 @@ class StopListCog(commands.Cog):
 
         for e in message.embeds:
             #check if it's a reaction to a vote
-            if ('stoplist' in e.footer.text):
+            if ('stoplist_cts' in e.footer.text):
                 title = e.title
                 try:
                     page = int(e.footer.text.split(':')[1])
@@ -121,14 +121,14 @@ class StopListCog(commands.Cog):
         if(page_to_show != -1):
             debut = (page_to_show - 1)*nbr_stop_per_page
             fin = debut + nbr_stop_per_page
-            titre = f"Liste des points d'arrêt - page {page_to_show}/{nbr_page}"
+            titre = f"Liste des points d'arrêt CTS - page {page_to_show}/{nbr_page}"
             content = ""
             stop_to_show = [s[0] for  s in self.stopslist[debut:fin]]
             for stop in enumerate(stop_to_show):
                 content += '\n {}'.format(stop[1])
 
             embed = discord.Embed(title=titre, description=content)
-            embed.set_footer(text=f'stoplist:{page_to_show}')
+            embed.set_footer(text=f'stoplist_cts:{page_to_show}')
             await message.edit(embed=embed)
 
         
