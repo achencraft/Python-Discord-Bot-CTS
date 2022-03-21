@@ -21,15 +21,19 @@ class NextCog(commands.Cog):
             if guild.name.startswith(utils_cog.settings.GUILD_NAME):
                 self.guild = guild
 
-        self.lux_token = utils_cog.settings.LUXTRAM_TOKEN
+        self.tcl_mail = utils_cog.settings.TCL_MAIL
+        self.tcl_pass = utils_cog.settings.TCL_PASS
         self.get_stops_list()
 
+        self.session = requests.Session()
+        self.session.auth = (utils_cog.settings.TCL_MAIL, utils_cog.settings.TCL_PASS)
 
 
-    @commands.command(name='lux', aliases=['luxembourg'])
-    async def lux(self, ctx, *args):
+
+    @commands.command(name='lyon')
+    async def lyon(self, ctx, *args):
         """
-        Commande: CTS? lux <action> <argument>
+        Commande: CTS? lyon <action> <argument>
 
         Action: "stations" ou "next"
         Argument: nom de la station en toutes lettres
@@ -63,13 +67,13 @@ class NextCog(commands.Cog):
             station_name = closest_name[0][0]
 
         if(distance < int(utils_cog.settings.DISTANCE_MAX)):
-            passages = self.get_next_vehicle(stop_id)
+            passages = self.get_next_vehicle(station_name, stop_id)
             if not len(passages[1]) == 0:
                 station_name = passages[0]
                 content = ""
             titre = f"Prochains passages - {station_name}"        
             for passage in passages[1]:
-                content += '\n Ligne {} > {} : **{}** min'.format(passage[0],passage[1],passage[2])
+                content += '\n Ligne {} > {} : **{}**'.format(passage[0],passage[1],passage[2])
         else:
             titre = "Prochains passages"  
             content = "Je n'ai pas réussi à trouver cette station :/"
@@ -86,60 +90,63 @@ class NextCog(commands.Cog):
         best_name = stoplist[scores.index(min(scores))]
         return [best_name,min(scores)]
 
-    def get_next_vehicle(self, stop_id):
+    def get_next_vehicle(self, stop_name, stop_id):
         passages=[]
-        stop_name = ""
 
-        query = requests.Session().get("https://cdt.hafas.de/opendata/apiserver/departureBoard?accessId="+self.lux_token+"&lang=fr&id="+stop_id+"&format=json")
+        
+        query = self.session.get("https://download.data.grandlyon.com/ws/rdata/tcl_sytral.tclpassagearret/all.json?maxfeatures=-1&start=1")
         ans = json.loads(query.text)     
 
-        print(len(ans["Departure"]))
-        if len(ans["Departure"]) > 0:
-            print(ans["Departure"][0]['Notes'])
-            stop_name = ans["Departure"][0]['stop']
-            print(stop_name)
 
-            for passage in ans["Departure"]:
-                line = passage['trainNumber']
+
+        if ans["nb_results"] > 0:
+
+
+
+            all_passages = list(filter(lambda x:x["id"] in stop_id, ans['values'] ))
+
+            for passage in all_passages:
+
+        
+                
+                line = passage['ligne']
                 destination = passage['direction']
-                heure_passage = passage['date']+" "+passage['time']
-                temps = arrow.get(heure_passage,'YYYY-MM-DD HH:mm:ss')
-                print(temps)
-                utc = arrow.utcnow()
-                now = utc.shift(hours=+1)
-                print(now)
-                diff = temps - now
-                print(diff)
-                temps_attente = str(diff.seconds//60)
+                temps_attente = passage['delaipassage']
+
+                if(line[-1] == 'A' or line[-1]=='B'):
+                    line = line[:-1]
 
                 out = (line,destination,temps_attente)
                 passages.append(out)
             
         print(passages)
 
+
         return (stop_name,passages)
 
     async def stoplist(self, ctx):
         """
-        Commande: CTS? lux stations
+        Commande: CTS? lyon stations
         Argument: /
         
-        Affiche la liste des stations au luxembourg
+        Affiche la liste des stations à lyon
         """
         utils_cog = self.bot.get_cog('UtilsCog')
         nbr_stop_per_page = int(utils_cog.settings.NBR_STOP_PER_PAGE)
+
+
         nbr_page = len(self.stopslist)//nbr_stop_per_page
         if(len(self.stopslist)%nbr_stop_per_page > 0):
             nbr_page = nbr_page+1
 
-        titre = f"Liste des points d'arrêt au Luxembourg - page 1/{nbr_page}"
+        titre = f"Liste des points d'arrêt à Lyon - page 1/{nbr_page}"
         content = ""
         stop_to_show = [s[0] for  s in self.stopslist[:nbr_stop_per_page]]
         for stop in enumerate(stop_to_show):
             content += '\n {}'.format(stop[1])
 
         embed = discord.Embed(title=titre, description=content)
-        embed.set_footer(text='stoplist_lux:1')
+        embed.set_footer(text='stoplist_lyon:1')
 
         msg = await ctx.send(embed=embed)
         
@@ -179,7 +186,7 @@ class NextCog(commands.Cog):
 
         for e in message.embeds:
             #check if it's a reaction to a vote
-            if ('stoplist_lux' in e.footer.text):
+            if ('stoplist_lyon' in e.footer.text):
                 title = e.title
                 try:
                     page = int(e.footer.text.split(':')[1])
@@ -214,14 +221,14 @@ class NextCog(commands.Cog):
         if(page_to_show != -1):
             debut = (page_to_show - 1)*nbr_stop_per_page
             fin = debut + nbr_stop_per_page
-            titre = f"Liste des points d'arrêt au Luxembourg - page {page_to_show}/{nbr_page}"
+            titre = f"Liste des points d'arrêt à Lyon - page {page_to_show}/{nbr_page}"
             content = ""
             stop_to_show = [s[0] for  s in self.stopslist[debut:fin]]
             for stop in enumerate(stop_to_show):
                 content += '\n {}'.format(stop[1])
 
             embed = discord.Embed(title=titre, description=content)
-            embed.set_footer(text=f'stoplist_lux:{page_to_show}')
+            embed.set_footer(text=f'stoplist_lyon:{page_to_show}')
             await message.edit(embed=embed)
 
 
@@ -229,23 +236,41 @@ class NextCog(commands.Cog):
         log = structlog.get_logger()
         stopList = []
         codeList = []
+        nameList = []
 
         with requests.Session() as s:
-            query = s.get("https://cdt.hafas.de/opendata/apiserver/location.nearbystops?accessId="+self.lux_token+"&originCoordLong=6.09528&originCoordLat=49.77723&maxNo=5000&r=100000&format=json")
+            query = s.get("https://download.data.grandlyon.com/ws/rdata/tcl_sytral.tclarret/all.json?maxfeatures=-1&start=1")
         
         ans = json.loads(query.text)
-        nbr_arret = len(ans["stopLocationOrCoordLocation"])
+        nbr_arret = ans["nb_results"]
         
         for i in range (0,nbr_arret):
-            stopname = ans["stopLocationOrCoordLocation"][i]['StopLocation']["name"]
-            stopcode = ans["stopLocationOrCoordLocation"][i]['StopLocation']["extId"]
+            stopname = ans["values"][i]['nom']
+            stopcode = ans["values"][i]['id']
 
-            if(stopcode not in codeList):
+            if(stopname not in nameList):
+                nameList.append(stopname)
+                stopList.append((stopname,[stopcode]))
+
+            elif(stopcode not in codeList):
                 codeList.append(stopcode)
-                stopList.append((stopname, stopcode))
-        log.info('stoplist luxembourg created')
+                for stop in stopList:
+                    if stop[0] == stopname:
+                        stop[1].append(stopcode)
+
+            
+
+        log.info('stoplist lyon created')
         self.stopslist = sorted(stopList, key=lambda stop: stop[0]) #tri alphabetique
 
+        s = ""
+        for stop in self.stopslist:
+            s = s + stop[0]+" "
+            for id in stop[1]:
+                s = s + str(id) + " "
+
+            s = s + '\n'
+        open('stops','+w').write(s)
 
 
      

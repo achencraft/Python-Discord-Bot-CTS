@@ -6,6 +6,8 @@ class Settings:
         self.GUILD_NAME=os.getenv('GUILD_NAME')
         self.CTS_TOKEN=os.getenv('CTS_TOKEN')
         self.LUXTRAM_TOKEN=os.getenv('LUXTRAM_TOKEN')
+        self.TCL_MAIL=os.getenv('TCL_MAIL')
+        self.TCL_PASS=os.getenv('TCL_PASS')
         self.NBR_STOP_PER_PAGE=os.getenv('NBR_STOP_PER_PAGE',20)
         self.BOT_PREFIX=os.getenv('BOT_PREFIX','CTS?')
         self.DISTANCE_MAX=os.getenv('DISTANCE_MAX',5)

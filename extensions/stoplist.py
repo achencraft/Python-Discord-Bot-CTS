@@ -149,7 +149,7 @@ class StopListCog(commands.Cog):
             if(stopcode not in codeList):
                 codeList.append(stopcode)
                 stopList.append((stopname, stopcode))
-        log.info('stoplist created')
+        log.info('stoplist strasbourg created')
         self.stopslist = sorted(stopList, key=lambda stop: stop[0]) #tri alphabetique
 
      

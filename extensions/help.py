@@ -32,7 +32,9 @@ class HelpCog(commands.Cog):
         embed.description += "- `CTS? stations` : pour obtenir la liste des stations\n"
         embed.description += "- `CTS? next <station>` : pour obtenir les prochains passages en station\n\n"
         embed.description += "- `CTS? lux stations` : pour obtenir la liste des stations du Luxembourg\n"
-        embed.description += "- `CTS? lux next <station>` : pour obtenir les prochains passages en station au Luxembourg\n"
+        embed.description += "- `CTS? lux next <station>` : pour obtenir les prochains passages en station au Luxembourg\n\n"
+        embed.description += "- `CTS? lyon stations` : pour obtenir la liste des stations à Lyon\n"
+        embed.description += "- `CTS? lyon next <station>` : pour obtenir les prochains passages en station à Lyon\n"
 
         await ctx.send(embed=embed)
 
