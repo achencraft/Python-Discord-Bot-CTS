@@ -1,0 +1,16 @@
+
+Programme qui génère les images pour le menu CTS chestcommand.
+
+Prend en argument :
+- le code couleur HTML hexadécimal d'une ligne de transport
+- le damage de départ pour le ressource pack
+
+
+
+En sortie : 
+
+un repertoire appelé par le code couleur contenant : 
+- des fichiers .png à mettre dans textures/item/cts/<code couleur>/
+- des fichiers .json à mettre dans models/item/cts/menu/<code couleur>/
+
+Un fichier <couleur>.json qui contient le nécessaire à inserer dans le .Json de l'item global
